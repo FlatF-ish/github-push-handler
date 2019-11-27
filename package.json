@@ -1,0 +1,14 @@
+{
+  "name": "github-push-handler",
+  "version": "1.0.0",
+  "description": "Handle push webhooks by executing commands",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Samuel Williams",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
