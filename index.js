@@ -78,7 +78,10 @@ app.post("/", async function(req, res) {
 	}
 
 	var ref = req.body.ref;
-	if( !ref ) { return; }
+	if( !ref ) { 
+		res.status(400).send("Invalid message structure");
+		return; 
+	}
 
 	var branch = ref.substring(11);
 	var cmd = CONFIG.commands[branch];

@@ -44,6 +44,8 @@ If you'd like to make this server auto-start (Linux):
 `su - <username> -c 'screen -d -m -S GPH <path_to_repo>/run.sh'`
 5. Run `run.sh` to start
 `./run.sh`
+6. Ensure the port you specified (or 3000 if you didn't) is port forwarded and accessible, you can use [this](https://reqbin.com/) set to `POST`
+You should get the response `Invalid message structure` with error code 400
 
 ### Webhook setup
 1. GitHub repository settings
