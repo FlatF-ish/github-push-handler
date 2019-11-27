@@ -25,12 +25,12 @@ doPrints: Should messages like "[WEBHOOK_LISTENER] Got push from master" be logg
 var CONFIG = {
 	commands: {
 		"master": "./buildMaster.sh",
-		"test-release": "./buildRelease.sh"
+		"test-release": "./buildTestRelease.sh"
 	},
 	locations: {
 	},
 	defaultLocation: "../",
-	secret: "mysecret",
+	secret: "",
 	doPrints: true
 }
 
@@ -79,19 +79,26 @@ app.post("/", async function(req, res) {
 
 	var ref = req.body.ref;
 	if( !ref ) { return; }
+
 	var branch = ref.substring(11);
 	var cmd = CONFIG.commands[branch];
 	if( cmd ) {
 		res.status(200).send("Updating " + branch);
+
 		logc("Got push from " + branch);
-		var location = CONFIG.locations[branch];
-		var preText = "cd \"" + CONFIG.defaultLocation + "\" && ";
+		var location = CONFIG.locations && CONFIG.locations[branch];
+
+		var preText
 		if( location ) {
 			preText = "cd \"" + location + "\" && ";
 			logc("Moving to " + location);
+		} else {
+			preText = "cd \"" + CONFIG.defaultLocation + "\" && ";
 		}
+
 		logc("Running: " + cmd);
 		const { stdout, stderr } = await exec(preText + cmd);
+
 		if( stderr ) {
 			logc("Error running command for " + branch + ":", true);
 			console.log(stderr);
