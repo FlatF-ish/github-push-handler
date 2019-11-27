@@ -32,19 +32,19 @@ var CONFIG = {
 Triggers on branches `master` and `test-release` running `buildMaster.sh` and `buildTestRelease.sh` respectively in parent directory.
 
 ### Deployment
-Simply run `npm install` then `npm start`
+Simply run `npm install` then `npm start`  
 If you'd like to make this server auto-start (Linux):
-1. Install [nodemon](https://www.npmjs.com/package/nodemon) globally
+1. Install [nodemon](https://www.npmjs.com/package/nodemon) globally  
 `npm install -g nodemon`
-2. Make `run.sh` executable
+2. Make `run.sh` executable  
 `chmod u+x ./run.sh`
-3. Open `rc.local`, you'll need to be an administator
+3. Open `rc.local`, you'll need to be an administator  
 `sudo nano /etc/init.d/rc.local`
-4. Add this launch code to the end of the file (on a new line), be sure to replace anything in `<brackets>` with the correct data
+4. Add this launch code to the end of the file (on a new line), be sure to replace anything in `<brackets>` with the correct data  
 `su - <username> -c 'screen -d -m -S GPH <path_to_repo>/run.sh'`
-5. Run `run.sh` to start
+5. Run `run.sh` to start  
 `./run.sh`
-6. Ensure the port you specified (or 3000 if you didn't) is port forwarded and accessible, you can use [this](https://reqbin.com/) set to `POST`
+6. Ensure the port you specified (or 3000 if you didn't) is port forwarded and accessible, you can use [this](https://reqbin.com/) set to `POST`  
 You should get the response `Invalid message structure` with error code 400
 
 ### Webhook setup
@@ -54,5 +54,5 @@ You should get the response `Invalid message structure` with error code 400
 4. Set `Payload URL`, this server runs on the environment variable `PORT` or 3000 by default. Listening on `http://your.url:3000/`
 5. Set `Content type` to `application/json`
 6. Set `Secret` to the same secret you defined in `CONFIG` or the environment variable `GITHUB_WEBHOOK_SECRET`
-7. Don't change anything else, press `Add webhook`
+7. Don't change anything else, press `Add webhook`  
 After this final step, if you've deployed already and `doPrints` is true, the console should print `Got ping from GitHub:` along with a zen message from GitHub
