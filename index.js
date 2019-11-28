@@ -1,12 +1,12 @@
-const express = require('express'),
-	  app = express(),
-	  http = require('http').Server(app),
-	  bodyParser = require('body-parser'),
-	  util = require('util'),
-	  exec = util.promisify(require('child_process').exec),
-	  crypto = require('crypto');
+const 	express = require( "express" ),
+	app = express(),
+	http = require( "http" ).Server( app ),
+	bodyParser = require( "body-parser" ),
+	util = require( "util" ),
+	exec = util.promisify( require( "child_process" ).exec ),
+	crypto = require( "crypto" );
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 /*
 commands:
 	branchName: Command to run
@@ -24,7 +24,7 @@ doPrints: Should messages like "[WEBHOOK_LISTENER] Got push from master" be logg
 
 var CONFIG = {
 	commands: {
-		"master": "./buildMaster.sh",
+		master: "./buildMaster.sh",
 		"test-release": "./buildTestRelease.sh"
 	},
 	locations: {
@@ -32,83 +32,83 @@ var CONFIG = {
 	defaultLocation: "../",
 	secret: "",
 	doPrints: true
-}
+};
 
 // If GITHUB_WEBHOOK_SECRET envinment var defined, make secret that
-CONFIG.secret = process.env.GITHUB_WEBHOOK_SECRET || CONFIG.secret
+CONFIG.secret = process.env.GITHUB_WEBHOOK_SECRET || CONFIG.secret;
 
-http.listen(PORT, function(){
-  	console.log('listening on *:'+PORT);
-});
+http.listen( PORT, function() {
+	console.log( "listening on *:" + PORT );
+} );
 
 // Log with header if CONFIG.doPrints
-function logc(msg, printAnyway) {
-	if( CONFIG.doPrints || printAnyway ){
-		console.log("[WEBHOOK_LISTENER] " + msg);
+function logc( msg, printAnyway ) {
+	if ( CONFIG.doPrints || printAnyway ) {
+		console.log( "[WEBHOOK_LISTENER] " + msg );
 	}
 }
 
 // Express doesn't give raw body anymore, so here is it
-app.use(bodyParser.json({
-    verify: function(req, res, buf, encoding) {
-        req.rawBody = buf.toString();
-    }
-}));
+app.use( bodyParser.json( {
+	verify: function( req, res, buf, encoding ) {
+		req.rawBody = buf.toString();
+	}
+} ) );
 
 // Generate sha1 digest of content and compare to signature
-function checkSecret(data, sig) {
-	let ownSig = "sha1=" + crypto.createHmac('sha1', CONFIG.secret).update(data).digest('hex');
-    return ownSig == sig;
+function checkSecret( data, sig ) {
+	const ownSig = "sha1=" + crypto.createHmac( "sha1", CONFIG.secret ).update( data ).digest( "hex" );
+	return ownSig === sig;
 }
 
 // !undefined gives error, so enforce that can't happen
-if( CONFIG.secret === undefined ) { CONFIG.secret = false; }
+if ( CONFIG.secret === undefined ) { CONFIG.secret = false; }
 
-app.post("/", async function(req, res) {
-	var isValid = (!CONFIG.secret) || checkSecret(req.rawBody, req.headers['x-hub-signature']);
-	if( !isValid ) {
-		res.status(403).send("Forbidden");
+app.post( "/", async function( req, res ) {
+	var isValid = ( !CONFIG.secret ) || checkSecret( req.rawBody, req.headers["x-hub-signature"] );
+	if ( !isValid ) {
+		res.status( 403 ).send( "Forbidden" );
 		return;
 	}
 
-	if( req.body.zen ) {
-		logc("Got ping from GitHub:");
-		logc(req.body.zen);
-		res.status(200).send("Ping successful!");
+	if ( req.body.zen ) {
+		logc( "Got ping from GitHub:" );
+		logc( req.body.zen );
+		res.status( 200 ).send( "Ping successful!" );
 	}
 
 	var ref = req.body.ref;
-	if( !ref ) { 
-		res.status(400).send("Invalid message structure");
-		return; 
+	if ( !ref ) {
+		res.status( 400 ).send( "Invalid message structure" );
+		return;
 	}
 
-	var branch = ref.substring(11);
+	var branch = ref.substring( 11 );
 	var cmd = CONFIG.commands[branch];
-	if( cmd ) {
-		res.status(200).send("Updating " + branch);
+	if ( cmd ) {
+		res.status( 200 ).send( "Updating " + branch );
 
-		logc("Got push from " + branch);
+		logc( "Got push from " + branch );
 		var location = CONFIG.locations && CONFIG.locations[branch];
 
-		var preText
-		if( location ) {
+		var preText;
+		if ( location ) {
 			preText = "cd \"" + location + "\" && ";
-			logc("Moving to " + location);
+			logc( "Moving to " + location );
 		} else {
 			preText = "cd \"" + CONFIG.defaultLocation + "\" && ";
 		}
 
-		logc("Running: " + cmd);
-		const { stdout, stderr } = await exec(preText + cmd);
+		logc( "Running: " + cmd );
+		const { stderr } = await exec( preText + cmd );
 
-		if( stderr ) {
-			logc("Error running command for " + branch + ":", true);
-			console.log(stderr);
+		if ( stderr ) {
+			logc( "Error running command for " + branch + ":", true );
+			console.log( stderr );
 		} else {
-			logc(branch + " command successful");
+			logc( branch + " command successful" );
 		}
 	} else {
-		res.status(201).send("Branch not watched");
+		res.status( 201 ).send( "Branch not watched" );
 	}
-})
+} );
